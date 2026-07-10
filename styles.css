@@ -30,10 +30,21 @@ html{scroll-behavior:smooth}
 .ghostd:hover{border-color:#F5F5F3}
 .navwrap{position:sticky;top:18px;z-index:50;padding:0 var(--gx);height:0;overflow:visible}
 .nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:13px 26px;border-radius:999px;transition:box-shadow .3s ease-out}
-.navhome{justify-self:start}
-.navright{justify-self:end}
+.navhome{justify-self:start;grid-column:1}
+.navlinks{grid-column:2}
+.navright{justify-self:end;grid-column:3}
 .nav a{font-size:14px;font-weight:500;color:#F5F5F3}.nav a:hover{opacity:.7}
-.navcta{font-size:9.5px;letter-spacing:.14em;color:#F5F5F3}
+.navcta{font-size:8.5px;letter-spacing:.1em;color:#F5F5F3;font-weight:400}
+.gap10{gap:10px}
+.navburger{display:none;width:34px;height:34px;background:transparent;border:none;cursor:pointer;padding:8px;flex-direction:column;justify-content:center;gap:6px}
+.navburger span{display:block;height:1.5px;width:100%;background:#F5F5F3;transition:transform .25s ease-out,opacity .25s ease-out}
+body[data-menu="open"] .navburger span:first-child{transform:translateY(3.75px) rotate(45deg)}
+body[data-menu="open"] .navburger span:last-child{transform:translateY(-3.75px) rotate(-45deg)}
+.navmenu{display:none;flex-direction:column;gap:0;margin-top:10px;padding:10px 24px;border-radius:22px;background:rgba(14,14,13,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 14px 34px rgba(0,0,0,.45);opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .22s ease-out,transform .22s ease-out}
+.navmenu a{font-size:15px;font-weight:500;color:#F5F5F3;padding:13px 0;border-bottom:1px solid rgba(245,245,243,.1)}
+.navmenu a:last-child{border-bottom:none}
+.navmenucta{font-size:9px !important;letter-spacing:.12em;display:flex;align-items:center;gap:8px}
+body[data-menu="open"] .navmenu{opacity:1;transform:none;pointer-events:auto}
 body[data-nav="glass"] .nav{background:rgba(18,18,17,.4);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -8px 16px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.35)}
 body[data-nav="invert"] .nav{mix-blend-mode:difference;color:#fff}
 body[data-nav="invert"] .nav .livedot{display:none}
@@ -117,7 +128,9 @@ html{scroll-behavior:auto}
 .nav{padding:10px 16px}
 .navlinks{display:none}
 .navlogo{height:22px !important}
-.navcta{font-size:9px}
+.navcta{display:none}
+.navburger{display:flex}
+.navmenu{display:flex}
 .h1{font-size:40px}
 .h2{font-size:30px}
 .h2b{font-size:34px}

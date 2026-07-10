@@ -43,6 +43,23 @@
     stats.forEach(function (el) { so.observe(el); });
   }
 
+  /* Mobile hamburger */
+  var burger = document.getElementById('navBurger');
+  var menu = document.getElementById('navMenu');
+  if (burger && menu) {
+    burger.addEventListener('click', function () {
+      var open = document.body.dataset.menu === 'open';
+      document.body.dataset.menu = open ? '' : 'open';
+      burger.setAttribute('aria-expanded', String(!open));
+    });
+    menu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        document.body.dataset.menu = '';
+        burger.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
   /* Work rail arrows */
   var rail = document.getElementById('rail');
   var prev = document.getElementById('railPrev');
