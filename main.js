@@ -3,24 +3,17 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* Reveal on scroll */
-  var revealed = document.querySelectorAll('.rv, .hc');
+  var revealed = document.querySelectorAll('.rv');
   if (!reduced && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
           e.target.classList.add('on');
           io.unobserve(e.target);
-          if (e.target.classList.contains('hc')) {
-            /* hand off to the idle float loop once the entrance settles */
-            setTimeout(function () { e.target.classList.add('float'); }, 1200);
-          }
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    revealed.forEach(function (el, i) {
-      if (el.classList.contains('hc')) el.style.setProperty('--fd', (i % 5) * 0.6);
-      io.observe(el);
-    });
+    revealed.forEach(function (el) { io.observe(el); });
   } else {
     revealed.forEach(function (el) { el.classList.add('on'); });
   }
@@ -57,26 +50,6 @@
   if (rail && prev && next) {
     prev.addEventListener('click', function () { rail.scrollLeft -= 318; });
     next.addEventListener('click', function () { rail.scrollLeft += 318; });
-  }
-
-  /* Hero parallax — cards drift at slightly different rates while the hero is in view */
-  var heroCards = document.querySelectorAll('#heroTilt .tiltc');
-  if (!reduced && heroCards.length) {
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        var y = window.scrollY;
-        if (y < window.innerHeight * 1.2) {
-          heroCards.forEach(function (c, i) {
-            var rate = 0.03 + (i % 3) * 0.025;
-            c.style.marginTop = (y * rate) + 'px';
-          });
-        }
-        ticking = false;
-      });
-    }, { passive: true });
   }
 
   /* Live dual clocks — BALI (WITA) / BARCELONA */
