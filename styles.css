@@ -76,6 +76,11 @@ body[data-nav="invert"] .nav .livedot{display:none}
 .step{display:grid;grid-template-columns:180px 1fr 320px;gap:32px;padding:34px 0;border-top:1px solid rgba(245,245,243,.14);align-items:baseline}
 .fcard{border:1px solid rgba(10,10,10,.14);padding:0;min-width:0;flex:1}
 .fbody{padding:22px 24px}
+.fimg{width:100%;height:100%;object-fit:cover;object-position:50% 22%;display:block;transition:transform .5s ease-out}
+.fcard:hover .fimg{transform:scale(1.02)}
+.fmeta-r{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.flink{color:#55554F}
+.flink:hover{color:#0A0A0A}
 .calbox{background:#FFFFFF;border-radius:14px;min-height:420px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#55554F}
 .foot{padding:40px var(--gx);display:flex;justify-content:space-between;border-top:1px solid rgba(245,245,243,.12)}
 .ph{background:repeating-linear-gradient(-45deg,#EDEDEA,#EDEDEA 6px,#E3E3DF 6px,#E3E3DF 12px);display:flex;align-items:center;justify-content:center;position:absolute;inset:0}
