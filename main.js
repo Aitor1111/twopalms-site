@@ -43,12 +43,17 @@
     stats.forEach(function (el) { so.observe(el); });
   }
 
-  /* Hero UGC videos — kick playback (some browsers ignore autoplay attr), pause for reduced motion */
-  document.querySelectorAll('.marquee video').forEach(function (v) {
-    if (reduced) { v.removeAttribute('autoplay'); v.pause(); return; }
-    var p = v.play();
-    if (p && p.catch) p.catch(function () { /* poster stays visible if playback is blocked */ });
-  });
+  /* Hero UGC videos — kick playback (some browsers ignore autoplay attr), pause for reduced motion.
+     Chrome defers media loading in hidden tabs, so re-kick when the tab becomes visible. */
+  function playUgc() {
+    document.querySelectorAll('.marquee video').forEach(function (v) {
+      if (reduced) { v.removeAttribute('autoplay'); v.pause(); return; }
+      var p = v.play();
+      if (p && p.catch) p.catch(function () { /* poster stays visible if playback is blocked */ });
+    });
+  }
+  playUgc();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) playUgc(); });
 
   /* Mobile hamburger */
   var burger = document.getElementById('navBurger');
