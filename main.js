@@ -55,6 +55,17 @@
   playUgc();
   document.addEventListener('visibilitychange', function () { if (!document.hidden) playUgc(); });
 
+  /* Block cards — tap to reveal deliverables on touch devices */
+  if (window.matchMedia('(hover: none)').matches) {
+    document.querySelectorAll('.block').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var wasOpen = b.classList.contains('open');
+        document.querySelectorAll('.block.open').forEach(function (o) { o.classList.remove('open'); });
+        if (!wasOpen) b.classList.add('open');
+      });
+    });
+  }
+
   /* Mobile hamburger */
   var burger = document.getElementById('navBurger');
   var menu = document.getElementById('navMenu');
