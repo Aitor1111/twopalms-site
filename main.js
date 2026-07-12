@@ -91,10 +91,35 @@
   });
   if (reduced) document.querySelectorAll('.block').forEach(function (b) { b.classList.add('decoded'); });
 
+  /* Idle glitch — undecoded lists keep mutating (the brand's minimal glitch signature).
+     Runs only while the blocks are on screen and the tab is visible. */
+  if (!reduced) {
+    var blocksVisible = false;
+    var blocksEl = document.querySelector('.blocks');
+    if (blocksEl && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        blocksVisible = entries[0].isIntersecting;
+      }, { threshold: 0.05 }).observe(blocksEl);
+    } else { blocksVisible = true; }
+    setInterval(function () {
+      if (!blocksVisible || document.hidden) return;
+      document.querySelectorAll('.block:not(.decoded) .blocklist li').forEach(function (li) {
+        var cur = [...li.textContent];
+        for (var n = 0; n < 2; n++) {
+          var i = 2 + Math.floor(Math.random() * (cur.length - 2));
+          if (cur[i] !== ' ') cur[i] = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        }
+        li.textContent = cur.join('');
+      });
+    }, 170);
+  }
+
   /* TP—RX problem selector — pick your pain, get the plan */
   var rxPills = document.querySelectorAll('#rxPills .rxchip');
   rxPills.forEach(function (pill) {
     pill.addEventListener('click', function () {
+      var rxSection = document.querySelector('.rx');
+      if (rxSection) rxSection.classList.add('touched');
       var panel = document.getElementById(pill.dataset.rx);
       var isActive = pill.classList.contains('active');
       rxPills.forEach(function (p) { p.classList.remove('active'); p.setAttribute('aria-expanded', 'false'); });
