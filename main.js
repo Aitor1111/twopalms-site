@@ -55,16 +55,57 @@
   playUgc();
   document.addEventListener('visibilitychange', function () { if (!document.hidden) playUgc(); });
 
-  /* Block cards — tap to reveal deliverables on touch devices */
-  if (window.matchMedia('(hover: none)').matches) {
-    document.querySelectorAll('.block').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var wasOpen = b.classList.contains('open');
-        document.querySelectorAll('.block.open').forEach(function (o) { o.classList.remove('open'); });
-        if (!wasOpen) b.classList.add('open');
-      });
-    });
+  /* Block cards — deliverables sit blurred + scrambled until first hover/tap, then decode and stay */
+  var GLYPHS = '#*+=/<>0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  document.querySelectorAll('.blocklist li').forEach(function (li) {
+    li.dataset.txt = li.textContent;
+    if (!reduced) {
+      li.textContent = [...li.dataset.txt].map(function (c, i) {
+        return (i < 2 || c === ' ') ? c : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }).join('');
+    }
+  });
+  function decodeLi(li, delay) {
+    setTimeout(function () {
+      var orig = li.dataset.txt;
+      var frame = 0;
+      var iv = setInterval(function () {
+        frame++;
+        var reveal = Math.min(2 + Math.floor(frame * 1.4), orig.length);
+        li.textContent = orig.slice(0, reveal) + [...orig.slice(reveal)].map(function (c) {
+          return c === ' ' ? ' ' : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        }).join('');
+        if (reveal >= orig.length) { clearInterval(iv); li.textContent = orig; }
+      }, 34);
+    }, delay);
   }
+  document.querySelectorAll('.block').forEach(function (b) {
+    function decodeBlock() {
+      if (b.classList.contains('decoded')) return;
+      b.classList.add('decoded');
+      if (reduced) { b.querySelectorAll('.blocklist li').forEach(function (li) { li.textContent = li.dataset.txt; }); return; }
+      b.querySelectorAll('.blocklist li').forEach(function (li, i) { decodeLi(li, i * 90); });
+    }
+    b.addEventListener('mouseenter', decodeBlock);
+    b.addEventListener('click', decodeBlock);
+  });
+  if (reduced) document.querySelectorAll('.block').forEach(function (b) { b.classList.add('decoded'); });
+
+  /* TP—RX problem selector — pick your pain, get the plan */
+  var rxPills = document.querySelectorAll('#rxPills .rxchip');
+  rxPills.forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      var panel = document.getElementById(pill.dataset.rx);
+      var isActive = pill.classList.contains('active');
+      rxPills.forEach(function (p) { p.classList.remove('active'); p.setAttribute('aria-expanded', 'false'); });
+      document.querySelectorAll('.rxpanel').forEach(function (pa) { pa.hidden = true; });
+      if (!isActive && panel) {
+        pill.classList.add('active');
+        pill.setAttribute('aria-expanded', 'true');
+        panel.hidden = false;
+      }
+    });
+  });
 
   /* Mobile hamburger */
   var burger = document.getElementById('navBurger');
