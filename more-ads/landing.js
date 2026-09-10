@@ -311,6 +311,11 @@
     var t = e.target;
     if (!t || !t.closest) return;
 
+    var vid = t.closest('[data-video]');
+    if (vid) { openVideo(vid.dataset.video, vid.dataset.label || ''); return; }
+    // clic en el fondo o en la ✕ del lightbox
+    if (t.closest('[data-act="closeVideo"]') && !t.closest('video')) { closeVideo(); return; }
+
     if (t.closest('[data-act="openQual"]')) { openQual(); return; }
     if (t.closest('[data-act="close"]')) { closeQual(); return; }
     if (t.closest('[data-act="backToQ1"]')) { state.step = 0; renderModal(); return; }
@@ -340,8 +345,36 @@
     }
   });
 
+  /* ---------- video lightbox --------------------------------------------
+     The tiles used to link out to Drive; they now play the local file in
+     place, so nobody leaves the landing mid-funnel. */
+  function closeVideo() {
+    var host = document.getElementById('lightbox');
+    if (!host || !host.innerHTML) return;
+    var v = host.querySelector('video');
+    if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
+    host.innerHTML = '';
+    if (!state.qualOpen) document.body.style.overflow = '';
+  }
+  function openVideo(src, label) {
+    var host = document.getElementById('lightbox');
+    if (!host) return;
+    document.body.style.overflow = 'hidden';
+    host.innerHTML =
+      '<div class="lbox" data-act="closeVideo">'
+      + '<button class="lboxx" data-act="closeVideo" aria-label="Close">✕</button>'
+      + '<figure class="lboxf">'
+      + '<video src="' + src + '" controls autoplay playsinline preload="metadata"></video>'
+      + (label ? '<figcaption class="lbl">' + label + '</figcaption>' : '')
+      + '</figure></div>';
+    var v = host.querySelector('video');
+    if (v) { v.focus(); v.play().catch(function () {}); }
+  }
+
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && state.qualOpen) closeQual();
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('lightbox') && document.getElementById('lightbox').innerHTML) closeVideo();
+    else if (state.qualOpen) closeQual();
   });
 
   var spendEl = document.getElementById('spendRange');
