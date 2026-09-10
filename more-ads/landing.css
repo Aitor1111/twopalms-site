@@ -113,3 +113,9 @@ html,body{overflow-x:hidden}
   .sticky .lbl{display:none!important}
   .sticky .ctamini{width:100%;justify-content:center;font-size:10.5px}
 }
+
+/* Brand avatars in the hero badge */
+.brandstack{display:flex;flex:none}
+.brandstack img{width:28px;height:28px;border-radius:50%;border:2px solid #0C0C0B;object-fit:cover;display:block;background:#111110}
+.brandstack img + img{margin-left:-8px}
+@media (max-width:820px){.brandstack img{width:24px;height:24px}}
