@@ -21,6 +21,34 @@ One-time setup (~5 min, needs a Cloudflare login):
 
 GitHub Pages keeps working meanwhile; nothing breaks by adding Cloudflare later.
 
+## Meta pixel
+
+Pixel `1645505560339533`, client-side only. Base snippet + `PageView` in the
+`<head>` of `index.html`; the funnel events at the bottom of `main.js`.
+
+| Event | Trigger |
+|---|---|
+| `PageView` | page load |
+| `InitiateCheckout` | first click on any CTA (`a[href="#call"]` / `a[href="#book"]`) |
+| `ViewContent` | Cal widget scrolls into view (20% visible) |
+| `Schedule` + `Lead` | booking completed |
+
+The booking event is the important one and the only non-obvious piece: Cal renders
+in a **cross-origin iframe**, so the pixel cannot see a booking by itself. We hook
+Cal's embed events (`bookingSuccessfulV2`, with `bookingSuccessful` as fallback for
+older embed builds). If the Cal embed is ever swapped or the namespace `15min`
+renamed, **the conversion event dies silently** — re-test in Meta Test Events after
+any change to the embed.
+
+Each event ships an `eventID` (`tp-<base36>`) so a future Conversions API
+integration can dedupe server-side events against these. Events fire at most once
+per pageview.
+
+**No CAPI yet, and no access token in this repo — ever.** This is a public repo on
+GitHub Pages with no server; a CAPI token here would let anyone inject fake events
+into the pixel. Server-side needs its own host (Cloudflare Worker + Cal.com
+`BOOKING_CREATED` webhook is the intended path).
+
 ## Pending assets
 
 See `../ASSETS-BRIEF/` (not deployed) — hero cards, work carousel, founder portraits, SVG logos, social URLs.

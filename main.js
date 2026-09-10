@@ -180,4 +180,56 @@
   Cal.config.forwardQueryParams = true;
   Cal.ns["15min"]("inline", { elementOrSelector: "#my-cal-inline-15min", config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" }, calLink: "aitor-truji/15min" });
   Cal.ns["15min"]("ui", { theme: "light", hideEventTypeDetails: false, layout: "month_view" });
+
+  /* Meta pixel — conversion events.
+     Base pixel + PageView live in index.html <head>; this fires the funnel.
+     Every event carries an eventID so a future Conversions API integration
+     can dedupe server events against these browser ones. */
+  var fbFired = {};
+  function fbEventId() {
+    return 'tp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+  function fbTrack(name, params) {
+    if (fbFired[name]) return;
+    fbFired[name] = true;
+    if (typeof window.fbq !== 'function') return;
+    window.fbq('track', name, params || {}, { eventID: fbEventId() });
+  }
+
+  /* Booking completed — the money event. Cal renders in a cross-origin iframe,
+     so the pixel can only see a booking through Cal's own embed events.
+     bookingSuccessfulV2 supersedes bookingSuccessful; older embed builds still
+     emit the latter, so listen to both and let fbTrack dedupe. */
+  ['bookingSuccessfulV2', 'bookingSuccessful'].forEach(function (action) {
+    Cal.ns["15min"]('on', {
+      action: action,
+      callback: function () {
+        fbTrack('Schedule', { content_name: '15min intro call' });
+        fbTrack('Lead', { content_name: '15min intro call' });
+      }
+    });
+  });
+
+  /* Reached the calendar */
+  var calEl = document.getElementById('my-cal-inline-15min');
+  if (calEl && 'IntersectionObserver' in window) {
+    var co = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        co.unobserve(e.target);
+        fbTrack('ViewContent', { content_name: 'booking calendar' });
+      });
+    }, { threshold: 0.2 });
+    co.observe(calEl);
+  }
+
+  /* CTA intent — every button on the page routes to #call or #book.
+     Fires once per pageview: we measure whether intent happened, not how
+     many times they clicked. */
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) return;
+    var a = e.target.closest('a[href="#call"], a[href="#book"]');
+    if (!a) return;
+    fbTrack('InitiateCheckout', { content_name: (a.textContent || '').trim().slice(0, 60) });
+  });
 })();
